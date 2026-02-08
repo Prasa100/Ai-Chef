@@ -1,0 +1,25 @@
+"use client";
+import React from 'react'
+import { UserButton } from '@clerk/nextjs'
+import { Refrigerator } from 'lucide-react';
+import { Cookie } from 'lucide-react';
+function UserDropdown() {
+  return (
+    <UserButton>
+        <UserButton.MenuItems>
+            <UserButton.Link
+                label="My Recipes"
+                labelIcon={<Cookie size ={16} />}
+                href='/recipes'
+            />
+            <UserButton.Link
+                label="My Pantry"
+                labelIcon={<Refrigerator size ={16} />}
+                href='/pantry'
+            />
+        </UserButton.MenuItems>
+    </UserButton>
+  )
+}
+
+export default UserDropdown

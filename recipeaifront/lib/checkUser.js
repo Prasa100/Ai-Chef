@@ -61,6 +61,28 @@ export default checkUser = async () => {
             },
         }
     );
+    const rolesData = await rolesResponse.json();
+    const authenticatedRole = rolesData.roles.find(
+        (role)=> role.type == "authenticated"
+    );
+    if(!authenticatedRole){
+        console.error("Authenticated Role not found");
+        return null;
+    }
+    const userData = {
+        username:
+            user.username || user.emailAddresses[0].emailAddress.split("@")[0],
+            email: user.emailAddresses[0].emailAddress,
+            password: `clerk_managed_${user.id}_${Date.now()}`,
+            confirmed: true, 
+            blocked: false,
+            clerkId: user.id,
+            firstname: user.firstName || "",
+            lastname: user.lastname || "",
+            imageUrl: user.imageUrl || "",
 
+            subscriptionTier,
+            role: authenticatedRole.id,
+    }
   } catch (error) {}
 };

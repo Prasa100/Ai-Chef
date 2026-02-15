@@ -17,6 +17,7 @@ function UserDropdown() {
                 labelIcon={<Refrigerator size ={16} />}
                 href='/pantry'
             />
+            <UserButton.Action label="manageAccount"/>
         </UserButton.MenuItems>
     </UserButton>
   )

@@ -4,7 +4,7 @@ const STRAPI_URL =
   process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
-export default checkUser = async () => {
+const checkUser = async () => {
   const user = await currentUser();
 
   if (!user) {
@@ -13,15 +13,14 @@ export default checkUser = async () => {
   }
 
   if (!STRAPI_API_TOKEN) {
-    console.error("X STRAPI_API_TOKEN is missing in .env.local");
+    console.error("STRAPI_API_TOKEN is missing in .env.local");
     return null;
   }
   const subscriptionTier = "free"; //to be implemented
 
   try {
     const existingUserResponse = await fetch(
-      `${STRAPI_URL}/api/users?filters[clerkId]
-            [$eq]=${user.id}`,
+      `${STRAPI_URL}/api/users?filters[clerkId][$eq]=${user.id}`,
       {
         headers: {
           Authorization: `Bearer ${STRAPI_API_TOKEN}`,
@@ -41,7 +40,7 @@ export default checkUser = async () => {
       if (existingUser.subscriptionTier !== subscriptionTier) {
         await fetch(`${STRAPI_URL}/api/users/${existingUser.id}`, {
           method: "PUT",
-          header: {
+          headers: {
             "content-type": "application/json",
             Authorization: `Bearer ${STRAPI_API_TOKEN}`,
           },
@@ -71,28 +70,30 @@ export default checkUser = async () => {
     }
     const userData = {
       username:
-        user.username || user.emailAddresses[0].emailAddress.split("@")[0],
+      user.username || user.emailAddresses[0].emailAddress.split("@")[0],
       email: user.emailAddresses[0].emailAddress,
       password: `clerk_managed_${user.id}_${Date.now()}`,
       confirmed: true,
       blocked: false,
+
       clerkId: user.id,
       firstname: user.firstName || "",
-      lastname: user.lastname || "",
+      lastname: user.lastName || "",
       imageUrl: user.imageUrl || "",
+      
       subscriptionTier,
       role: authenticatedRole.id,
     };
     const newUserResponse = await fetch(`${STRAPI_URL}/api/users`, {
       method: "POST",
-      header: {
-        "content-Type": "application/json",
+      headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${STRAPI_API_TOKEN}`,
       },
       body: JSON.stringify(userData),
     });
     if(!newUserResponse.ok){
-      const erroText = await newUserResponse.text();
+      const errorText = await newUserResponse.text();
       console.error("Error Creating User:", errorText);
       return null;
     }
@@ -103,3 +104,4 @@ export default checkUser = async () => {
       return null;
   }
 };
+export default checkUser;

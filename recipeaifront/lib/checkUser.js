@@ -89,7 +89,7 @@ export default checkUser = async () => {
         "content-Type": "application/json",
         Authorization: `Bearer ${STRAPI_API_TOKEN}`,
       },
-      body: JSON.stringify(userData);
+      body: JSON.stringify(userData),
     });
     if(!newUserResponse.ok){
       const erroText = await newUserResponse.text();

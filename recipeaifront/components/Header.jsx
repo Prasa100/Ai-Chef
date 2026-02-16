@@ -11,10 +11,10 @@ import {
 } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import UserDropdown from "./UserDropdown";
+import checkUser from "@/lib/checkUser";
 
 async function Header() {
-  const user = null; //userFetchinglogic
-
+  const user = await checkUser();
   return (
       <header className="fixed top-0 w-full border-b border-stone-200 bg-stone-50/80 backdrop-blur-md z-50 supports-backdrop-filter:bg-stone-50/60">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">

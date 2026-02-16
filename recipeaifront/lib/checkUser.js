@@ -29,60 +29,77 @@ export default checkUser = async () => {
         cache: "no-store",
       },
     );
-    if(!existingUserResponse.ok){
-        const errorText = await existingUserResponse.text();
-        console.error("Strapi error response", errorText);
-        return null;
+    if (!existingUserResponse.ok) {
+      const errorText = await existingUserResponse.text();
+      console.error("Strapi error response", errorText);
+      return null;
     }
     const existingUserData = await existingUserResponse.json();
-    if(existingUserData.length > 0){
-        const existingUser = existingUserData[0];
+    if (existingUserData.length > 0) {
+      const existingUser = existingUserData[0];
 
-        if(existingUser.subscriptionTier !== subscriptionTier){
-            await fetch(`${STRAPI_URL}/api/users/${existingUser.id}`, {
-                method: "PUT",
-                header: {
-                    "content-type": "application/json",
-                    Authorization: `Bearer ${STRAPI_API_TOKEN}`,
-                },
-                body: JSON.stringify({subscriptionTier}),
-            });
-        }
-        return  {...existingUser, subscriptionTier};
+      if (existingUser.subscriptionTier !== subscriptionTier) {
+        await fetch(`${STRAPI_URL}/api/users/${existingUser.id}`, {
+          method: "PUT",
+          header: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+          },
+          body: JSON.stringify({ subscriptionTier }),
+        });
+      }
+      return { ...existingUser, subscriptionTier };
     }
 
     //creating new user strapi
 
     const rolesResponse = await fetch(
-        `${STRAPI_URL}/api/users-permissions/roles`,
-        {
-            headers: {
-                Authorization: `Bearer ${STRAPI_API_TOKEN}`
-            },
-        }
+      `${STRAPI_URL}/api/users-permissions/roles`,
+      {
+        headers: {
+          Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+        },
+      },
     );
     const rolesData = await rolesResponse.json();
     const authenticatedRole = rolesData.roles.find(
-        (role)=> role.type == "authenticated"
+      (role) => role.type == "authenticated",
     );
-    if(!authenticatedRole){
-        console.error("Authenticated Role not found");
-        return null;
+    if (!authenticatedRole) {
+      console.error("Authenticated Role not found");
+      return null;
     }
     const userData = {
-        username:
-            user.username || user.emailAddresses[0].emailAddress.split("@")[0],
-            email: user.emailAddresses[0].emailAddress,
-            password: `clerk_managed_${user.id}_${Date.now()}`,
-            confirmed: true, 
-            blocked: false,
-            clerkId: user.id,
-            firstname: user.firstName || "",
-            lastname: user.lastname || "",
-            imageUrl: user.imageUrl || "",
-
-            subscriptionTier,
-            role: authenticatedRole.id,
+      username:
+        user.username || user.emailAddresses[0].emailAddress.split("@")[0],
+      email: user.emailAddresses[0].emailAddress,
+      password: `clerk_managed_${user.id}_${Date.now()}`,
+      confirmed: true,
+      blocked: false,
+      clerkId: user.id,
+      firstname: user.firstName || "",
+      lastname: user.lastname || "",
+      imageUrl: user.imageUrl || "",
+      subscriptionTier,
+      role: authenticatedRole.id,
+    };
+    const newUserResponse = await fetch(`${STRAPI_URL}/api/users`, {
+      method: "POST",
+      header: {
+        "content-Type": "application/json",
+        Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+      },
+      body: JSON.stringify(userData);
+    });
+    if(!newUserResponse.ok){
+      const erroText = await newUserResponse.text();
+      console.error("Error Creating User:", errorText);
+      return null;
     }
-  } catch (error) {}
+    const newUser = await newUserResponse.json();
+    return newUser;
+  } catch (error) {
+      console.error("Error in checkUser", error.message);
+      return null;
+  }
 };

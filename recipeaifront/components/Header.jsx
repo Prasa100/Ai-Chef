@@ -84,7 +84,6 @@ async function Header() {
                 </Badge>
               </PricingModal>
             )}
-
           <UserDropdown/>
           </SignedIn>
 

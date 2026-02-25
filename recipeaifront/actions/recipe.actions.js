@@ -1,6 +1,6 @@
 "use server";
 
-import { checkUser } from "@/lib/checkUser";
+import checkUser from "@/lib/checkUser";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { freeMealRecommendations, proTierLimit } from "@/lib/arcjet";
 import { request } from "@arcjet/next";
@@ -22,6 +22,19 @@ function normalizeTitle(title) {
     .join(" ");
 }
 
+function toStrapiBlocks(text) {
+  return [
+    {
+      type: "paragraph",
+      children: [
+        {
+          type: "text",
+          text: text || "",
+        },
+      ],
+    },
+  ];
+}
 // Helper function to fetch image from Unsplash
 async function fetchRecipeImage(recipeName) {
   try {
@@ -257,7 +270,7 @@ Guidelines:
       "moroccan",
       "brazilian",
       "caribbean",
-      "middle-eastern",
+      "middle - eastern",
       "british",
       "german",
       "portuguese",
@@ -275,7 +288,7 @@ Guidelines:
     const strapiRecipeData = {
       data: {
         title: normalizedTitle,
-        description: recipeData.description,
+        description: toStrapiBlocks(recipeData.description),
         cuisine,
         category,
         ingredients: recipeData.ingredients,
@@ -286,7 +299,7 @@ Guidelines:
         nutrition: recipeData.nutrition,
         tips: recipeData.tips,
         substitutions: recipeData.substitutions,
-        imageUrl: imageUrl || "",
+        ImageURL: imageUrl || "",
         isPublic: true,
         author: user.id,
       },
@@ -633,3 +646,4 @@ export async function getSavedRecipes() {
     throw new Error(error.message || "Failed to load saved recipes");
   }
 }
+

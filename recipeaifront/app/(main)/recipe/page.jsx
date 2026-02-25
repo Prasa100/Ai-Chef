@@ -33,6 +33,33 @@ import { RecipePDF } from "@/components/RecipePDF";
 import { ClockLoader } from "react-spinners";
 import ProLockedSection from "@/components/ProLockedSection";
 
+function getDescriptionText(description) {
+  if (!description) return "";
+  if (typeof description === "string") return description;
+
+  if (Array.isArray(description)) {
+    return description
+      .map((block) => {
+        if (!block?.children || !Array.isArray(block.children)) return "";
+        return block.children
+          .map((child) => (typeof child?.text === "string" ? child.text : ""))
+          .join("")
+          .trim();
+      })
+      .filter(Boolean)
+      .join("\n\n");
+  }
+
+  if (description?.children && Array.isArray(description.children)) {
+    return description.children
+      .map((child) => (typeof child?.text === "string" ? child.text : ""))
+      .join("")
+      .trim();
+  }
+
+  return "";
+}
+
 function RecipeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -41,6 +68,7 @@ function RecipeContent() {
   const [recipe, setRecipe] = useState(null);
   const [recipeId, setRecipeId] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const descriptionText = getDescriptionText(recipe?.description);
 
   // Get or generate recipe
   const {
@@ -262,7 +290,7 @@ function RecipeContent() {
 
             {/* Description */}
             <p className="text-lg text-stone-600 mb-6 font-light">
-              {recipe.description}
+              {descriptionText}
             </p>
 
             {/* Meta Info */}
@@ -606,3 +634,4 @@ export default function RecipePage() {
     </Suspense>
   );
 }
+

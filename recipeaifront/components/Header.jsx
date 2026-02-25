@@ -1,27 +1,20 @@
 import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Cookie } from "lucide-react";
-import {
-  SignedIn,
-  SignInButton,
-  SignedOut,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
 import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Sparkles } from "lucide-react";
-import UserDropdown from "./UserDropdown";
-import checkUser from "@/lib/checkUser";
+import { Cookie, Refrigerator, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
+import HowToCookModal from "./HowToCookModal";
 import PricingModal from "./PricingModal";
+import Image from "next/image";
+import checkUser from "@/lib/checkUser";
+import { Badge } from "./ui/badge";
+import UserDropdown from "./UserDropdown";
 
-
-async function Header() {
+export default async function Header() {
   const user = await checkUser();
 
   return (
-      <header className="fixed top-0 w-full border-b border-stone-200 bg-stone-50/80 backdrop-blur-md z-50 supports-backdrop-filter:bg-stone-50/60">
+    <header className="fixed top-0 w-full border-b border-stone-200 bg-stone-50/80 backdrop-blur-md z-50 supports-backdrop-filter:bg-stone-50/60">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link
@@ -50,14 +43,14 @@ async function Header() {
             href="/pantry"
             className="hover:text-orange-600 transition-colors flex gap-1.5 items-center"
           >
-            
+            <Refrigerator className="w-4 h-4" />
             My Pantry
           </Link>
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-4">
-        
+          <HowToCookModal />
 
           <SignedIn>
             {/* Pricing Modal with Built-in Trigger */}
@@ -84,7 +77,8 @@ async function Header() {
                 </Badge>
               </PricingModal>
             )}
-          <UserDropdown/>
+
+            <UserDropdown />
           </SignedIn>
 
           <SignedOut>
@@ -107,5 +101,3 @@ async function Header() {
     </header>
   );
 }
-
-export default Header;

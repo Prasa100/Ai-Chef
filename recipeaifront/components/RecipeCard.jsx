@@ -12,6 +12,32 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+function descriptionToText(value) {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+
+  if (Array.isArray(value)) {
+    return value
+      .map((block) => {
+        if (!block?.children || !Array.isArray(block.children)) return "";
+        return block.children
+          .map((child) => (typeof child?.text === "string" ? child.text : ""))
+          .join("")
+          .trim();
+      })
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  if (value?.children && Array.isArray(value.children)) {
+    return value.children
+      .map((child) => (typeof child?.text === "string" ? child.text : ""))
+      .join("")
+      .trim();
+  }
+
+  return "";
+}
 export default function RecipeCard({ recipe, variant = "default" }) {
   // Handle different recipe data structures
   const getRecipeData = () => {
@@ -29,7 +55,7 @@ export default function RecipeCard({ recipe, variant = "default" }) {
     if (recipe.matchPercentage) {
       return {
         title: recipe.title,
-        description: recipe.description,
+        description: descriptionToText(recipe.description),
         category: recipe.category,
         cuisine: recipe.cuisine,
         prepTime: recipe.prepTime,
@@ -47,7 +73,7 @@ export default function RecipeCard({ recipe, variant = "default" }) {
     if (recipe) {
       return {
         title: recipe.title,
-        description: recipe.description,
+        description: descriptionToText(recipe.description),
         category: recipe.category,
         cuisine: recipe.cuisine,
         prepTime: recipe.prepTime,
@@ -362,3 +388,4 @@ export default function RecipeCard({ recipe, variant = "default" }) {
     </Link>
   );
 }
+
